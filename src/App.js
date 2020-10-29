@@ -4,7 +4,7 @@ import config from "./config";
 import "./styles.css";
 
 export default function App() {
-  const [searchValue, setSearchValue] = useState(() => "");
+  const [searchValue, setSearchValue] = useState("");
   const [searchInfo, setSearchInfo] = useState(() => "Start typing for search");
   const [requestedData, setrequestedData] = useState(() => "");
   const [selectedBreed, setSelectedBreed] = useState(() => "");
@@ -26,17 +26,24 @@ export default function App() {
     setTimeout(
       (event) => {
         setSearchValue(event.target.value);
+        console.log("SetSearch to:", event.target.value);
       },
-      500,
+      25000,
       event
     );
   };
 
-  const handleBreedSelect = (event) => {
-    setSelectedBreed(requestedData[event.target.id]);
+  const handleBreedSelect = (id) => {
+    setSelectedBreed(requestedData[id]);
+  };
+
+  const handleAddSearchValue = (newValue) => {
+    setSearchValue(newValue);
+    console.log("Add: ", newValue);
   };
 
   useEffect(() => {
+    console.log("trigger useEffect and Axios with new:", searchValue);
     const handleRequest = async () => {
       try {
         const response = await axios.get(`${appConfig.url}/?q=${searchValue}`, {
@@ -74,16 +81,11 @@ export default function App() {
     //searchInfo = 'Start typing for search'; // ???? how to set with useRef, triggered by searchValue changes
     let resultElement = "";
 
-    if (requestedData !== "" && requestedData !== "error") {
+    if (requestedData !== "") {
       const results = requestedData.map((result, index) => {
         // ??? how to custom props... must full lowercase as: dataindex but...
         return (
-          <button
-            key={result.id}
-            id={index}
-            dataindex={index}
-            onClick={handleBreedSelect}
-          >
+          <button key={result.id} onClick={() => handleBreedSelect(index)}>
             {result.name}
           </button>
         );
@@ -108,6 +110,9 @@ export default function App() {
         <br />
         <hr />
         <br />
+        <button id={123} onClick={() => handleAddSearchValue("subidubi")}>
+          subidubi
+        </button>
         <SearchInfo />
         <SearchResult />
         <SelectedBreed />
